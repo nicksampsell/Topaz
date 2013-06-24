@@ -1,0 +1,49 @@
+#! /bin/bash 
+
+SCRIPT=$(readlink -f $0)
+SCRIPTPATH=$(dirname $SCRIPT)
+
+clear  
+echo "***      Server Setup      ***"
+
+# =======================
+# Install Initial Stuff
+# =======================
+
+sudo apt-get update
+sudo apt-get install -y curl git
+
+# =======================
+# Install Apache
+# =======================
+sudo apt-get install -y apache2
+sudo mv /etc/apache2/apache2.conf /etc/apache2/apache2.backup.conf
+sudo cp "$SCRIPTPATH/files/apache2.conf" /etc/apache2/apache2.conf
+sudo a2enmode rewrite
+sudo service apache2 restart
+
+# =======================
+# Install MySQL
+# =======================
+
+sudo apt-get install -y mysql-server
+sudo mysql_secure_installation
+sudo mv /etc/mysql/my.cnf /etc/mysql/my.backup.conf
+sudo cp "$SCRIPTPATH/files/my.cnf" /etc/mysql/my.cnf
+sudo service mysql restart
+
+# =======================
+# Install PHP
+# =======================
+
+sudo apt-get install -y php5 php-pear php5-curl
+sudo apt-get install -y php5-mysql
+sudo mv /etc/php5/apache2/php.ini /etc/php5/apache2/php.backup.ini
+sudo cp "$SCRIPTPATH/files/php.ini" /etc/php5/apache2/php.ini
+sudo service apache2 restart
+
+# =======================
+# Siteup
+# =======================
+
+"$SCRIPTPATH/siteup"
